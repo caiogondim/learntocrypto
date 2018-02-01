@@ -1,14 +1,14 @@
 [
   {
-    "cmd": "deposit",
-    "amount": 3
+    "value": 4
   },
   {
-    "cmd": "withdraw",
-    "amount": 2
+    "value": 4
   },
   {
-    "cmd": "withdraw",
-    "amount": 2
+    "value": -4
+  },
+  {
+    "value": -4
   }
 ]

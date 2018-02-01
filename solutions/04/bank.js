@@ -2,6 +2,7 @@ var jsonStream = require('duplex-json-stream')
 var net = require('net')
 var util = require('util')
 var writeFile = util.promisify(require('fs').writeFile)
+var log = require('./log.json')
 
 var server = net.createServer(function (socket) {
   socket = jsonStream(socket)
@@ -40,24 +41,15 @@ var server = net.createServer(function (socket) {
 server.listen(3876)
 
 async function getBalance() {
-  var log = require('./log.json')
-
-  return log.reduce((sum, entry) => {
-    if (entry.cmd === 'deposit') {
-      return sum + entry.amount
-    } else if (entry.cmd === 'withdraw') {
-      return sum - entry.amount
-    }
-  }, 0)
+  return log.reduce((sum, entry) => sum + entry.value, 0)
 }
 
-async function deposit(amount) {
-  amount = parseFloat(amount)
+async function deposit(value) {
+  value = parseFloat(value)
 
-  var log = require('./log.json')
   log.push({
     cmd: 'deposit',
-    amount
+    value
   })
 
   await writeFile(
@@ -66,19 +58,18 @@ async function deposit(amount) {
   )
 }
 
-async function withdraw(amount) {
-  amount = parseFloat(amount)
+async function withdraw(value) {
+  value = parseFloat(value)
 
   var curBalance = await getBalance()
 
-  if (curBalance < amount) {
+  if (curBalance < value) {
     throw new Error('Insuficient funds')
   }
 
-  var log = require('./log.json')
   log.push({
     cmd: 'withdraw',
-    amount
+    value: value * -1
   })
 
   await writeFile(

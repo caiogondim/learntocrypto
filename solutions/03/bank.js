@@ -14,7 +14,7 @@ var server = net.createServer(async function (socket) {
         socket.end({cmd: 'balance', balance: getBalance()})
         break
       case 'deposit':
-        log.push(msg)
+        log.push({ value: msg.amount })
         socket.end({cmd: 'balance', balance: getBalance()})
         break
       case 'withdraw':
@@ -40,27 +40,20 @@ var server = net.createServer(async function (socket) {
 server.listen(3876)
 
 function getBalance() {
-  return log.reduce((sum, entry) => {
-    if (entry.cmd === 'deposit') {
-      return sum + entry.amount
-    } else if (entry.cmd === 'withdraw') {
-      return sum - entry.amount
-    }
-  }, 0)
+  return log.reduce((sum, entry) => sum + entry.value, 0)
 }
 
-function withdraw(amount) {
-  amount = parseFloat(amount)
+function withdraw(value) {
+  value = parseFloat(value)
 
   var curBalance = getBalance()
 
-  if (curBalance < amount) {
+  if (curBalance < value) {
     throw new Error('Insuficient funds')
   }
 
   log.push({
-    cmd: 'withdraw',
-    amount
+    value: value * -1
   })
 }
 
