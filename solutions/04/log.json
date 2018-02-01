@@ -14,9 +14,5 @@
   {
     "cmd": "withdraw",
     "amount": 2
-  },
-  {
-    "cmd": "withdraw",
-    "amount": 2
   }
 ]
